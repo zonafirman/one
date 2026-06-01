@@ -4,8 +4,8 @@ _one_completion() {
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    # Pilihan perintah utama dari one-cli kamu
-    opts="search install list remove system extract help"
+    # Pilihan perintah utama dari one-cli kamu yang makin lengkap & sakti, sayang!
+    opts="search install list remove system extract update fetch help"
 
     # Tab tingkat pertama (setelah kata 'one')
     if [ $COMP_CWORD -eq 1 ]; then
@@ -33,11 +33,10 @@ _one_completion() {
         esac
     fi
 
-    # TAB TINGKAT KETIGA: Fitur sakti baru khusus setelah argumen pilihan, sayang!
+    # TAB TINGKAT KETIGA: Fitur deteksi target file/folder lokal khusus remove -d
     if [ $COMP_CWORD -eq 3 ]; then
         local grand_prev="${COMP_WORDS[COMP_CWORD-2]}"
         
-        # Jika perintahnya 'one remove -d', biarkan Bash menyarankan file/folder lokal
         if [ "${grand_prev}" = "remove" ] && [ "${prev}" = "-d" ]; then
             COMPREPLY=( $(compgen -f -- ${cur}) )
             return 0

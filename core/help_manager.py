@@ -32,6 +32,7 @@ class HelpManager:
         print(f"   ├─ one remove <nama package>         -> Menghapus paket aplikasi yang terinstal.")
         print(f"   └─ one remove -d <nama>              -> Menghapus file atau folder secara permanen.")
         print(f"  {self.C_PINE}system{self.C_RESET}     : Menampilkan visualisasi performa sistem (CPU, RAM, DISK) secara real-time.")
+        print(f"  {self.C_PINE}fetch{self.C_RESET}      -> Menampilkan spesifikasi sistem estetik ala Rosé Pine, sayang")
         print(f"  {self.C_PINE}extract{self.C_RESET}    : Mengekstrak berbagai format arsip (zip, tar, rar, 7z) secara otomatis.")
         print(f"  {self.C_PINE}help{self.C_RESET}       : Menampilkan menu bantuan.")
         

@@ -11,6 +11,7 @@ from core.system_manager import SystemManager
 from core.extract_manager import ExtractManager
 from core.file_manager import FileManager
 from core.update_manager import UpdateManager
+from core.fetch_manager import FetchManager
 
 class PackageManager:
     def __init__(self):
@@ -24,6 +25,7 @@ class PackageManager:
         self.extractor = ExtractManager()
         self.file_handler = FileManager()
         self.update_manager = UpdateManager()
+        self.fetch_manager = FetchManager()
         
         # Kode warna khusus untuk tampilan lokal
         self.C_PINE = "\033[36m"
@@ -307,6 +309,9 @@ if __name__ == '__main__':
         elif command == "system":
             print("🚀 Membuka Dashboard Sistem...")
             manager.system_monitor.start()
+
+        elif command == "fetch":
+            manager.fetch_manager.show_fetch()
             
         else:
             # Jika argumen yang dimasukkan salah atau kurang (misal ketik 'one install' tanpa nama aplikasi)
