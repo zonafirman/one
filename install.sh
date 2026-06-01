@@ -1,90 +1,61 @@
 #!/bin/bash
 
-# Warna untuk estetika output ala Rosé Pine
-C_PINE="\033[36m"
-C_GOLD="\033[33m"
-C_RESET="\033[0m"
+# ====================================================================
+#  Mantra Installer Universal One-CLI - Rosé Pine Edition 🌸
+# ====================================================================
 
-echo -e "${C_PINE}==================================================${C_RESET}"
-echo -e "🚀  ${C_GOLD}Memulai Instalasi One-CLI Multi-Shell Universal${C_RESET}"
-echo -e "${C_PINE}==================================================${C_RESET}"
+# 1. Tentukan Direktori Sumber dan Target (Universal Berbasis $HOME)
+REPO_DIR="$HOME/one"  
+CORE_DIR="$REPO_DIR/core"
 
-# 1. Tentukan direktori target menggunakan folder $HOME user aktif
-TARGET_DIR="$HOME/rli-cli"
-CORE_DIR="$TARGET_DIR/core"
+echo "===================================================================="
+echo " 🚀 Memulai Instalasi / Sinkronisasi Core One-CLI Universal"
+echo "===================================================================="
 
-echo -e "📂 Membuat direktori sistem di $TARGET_DIR..."
-mkdir -p "$CORE_DIR"
+# 2. Pastikan struktur folder inti sudah siap
+if [ ! -d "$CORE_DIR" ]; then
+    echo "📂 Membuat direktori sistem di $CORE_DIR..."
+    mkdir -p "$CORE_DIR"
+fi
 
-# 2. Menyalin berkas kode utama dan modul-modul internal
-echo -e "📦 Menyalin jeroan kode dan modul manajer..."
-cp core/package_manager.py "$CORE_DIR/"
-cp core/help_manager.py "$CORE_DIR/"
-cp core/package_utils.py "$CORE_DIR/" 2>/dev/null || cp core/package_utils import "$CORE_DIR/" 2>/dev/null
-cp core/system_manager.py "$CORE_DIR/"
-cp core/extract_manager.py "$CORE_DIR/"
-cp core/file_manager.py "$CORE_DIR/"       
-cp core/one_completion.sh "$CORE_DIR/"
+# 3. Proses Penyalinan Modul Python & Shell secara Presisi
+echo "📦 Menyalin jeroan kode, modul manajer, dan tema estetik..."
 
-echo -e "🔍 Mendeteksi lingkungan shell di komputer ini..."
+# Modul dasar sistem
+cp "$REPO_DIR/core/package_manager.py" "$CORE_DIR/" 2>/dev/null
+cp "$REPO_DIR/core/help_manager.py" "$CORE_DIR/" 2>/dev/null
+cp "$REPO_DIR/core/file_manager.py" "$CORE_DIR/" 2>/dev/null
 
-# Logika fungsi utama yang akan disuntikkan (untuk Bash & Zsh)
-BASH_ZSH_FUNCTION=$(cat << 'EOF'
+# 🔥 SINKRONISASI MODUL BARU: Termasuk Upgrade Manager kesayanganmu!
+cp "$REPO_DIR/core/update_manager.py" "$CORE_DIR/" 2>/dev/null
+cp "$REPO_DIR/core/upgrade_manager.py" "$CORE_DIR/" 2>/dev/null  # <--- Sudah aman di sini ya, sayang!
+cp "$REPO_DIR/core/fetch_manager.py" "$CORE_DIR/" 2>/dev/null
 
-# Custom Command buat rli-cli Universal Package Manager
-one() {
-    PYTHONPATH="$HOME/rli-cli" python3 -m core.package_manager "$@"
+# Skrip pelengkap otomatis (Autocomplete)
+cp "$REPO_DIR/core/one_completion.sh" "$CORE_DIR/" 2>/dev/null
+
+# 4. Menyuntikkan Fungsi Utama ke dalam .bashrc
+echo "🔍 Mendeteksi lingkungan shell di komputer ini..."
+
+# Cek apakah shortcut fungsi 'one' sudah terdaftar di .bashrc
+if ! grep -q "function one()" "$HOME/.bashrc"; then
+    echo "📝 [Bash Detected] Menyuntikkan konfigurasi dan autocomplete baru ke ~/.bashrc"
+    cat << 'EOF' >> "$HOME/.bashrc"
+
+# >>> ONE-CLI UNIVERSAL CONFIG CONFIGURATION >>>
+export PYTHONPATH="$HOME/one"
+function one() {
+    python3 -m core.package_manager "$@"
 }
-
-# Auto-complete untuk One-CLI
-if [ -f "$HOME/rli-cli/core/one_completion.sh" ]; then
-    source "$HOME/rli-cli/core/one_completion.sh"
+if [ -f "$HOME/one/core/one_completion.sh" ]; then
+    source "$HOME/one/core/one_completion.sh"
 fi
+# <<< ONE-CLI UNIVERSAL CONFIG CONFIGURATION <<<
 EOF
-)
-
-# 3. PROSES SUNTIK OTOMATIS BERDASARKAN SHELL YANG AKTIF, SAYANG
-
-# KONDISI A: Konfigurasi untuk BASH (Termasuk penanganan khusus KDE Plasma Profile)
-if [ -f "$HOME/.bashrc" ]; then
-    if ! grep -q "one()" "$HOME/.bashrc"; then
-        echo "$BASH_ZSH_FUNCTION" >> "$HOME/.bashrc"
-        echo -e "✅ Fungsi 'one()' berhasil dipasang di ~/.bashrc"
-    fi
-    
-    # TRICK KHUSUS KDE PLASMA: Pastikan Konsole membaca .bashrc via .bash_profile
-    if [ -f "$HOME/.bash_profile" ]; then
-        if ! grep -q "bashrc" "$HOME/.bash_profile"; then
-            echo -e "\nif [ -f ~/.bashrc ]; then\n    source ~/.bashrc\nfi" >> "$HOME/.bash_profile"
-            echo -e "📦 [KDE Plasma Detected] Menghubungkan .bash_profile ke .bashrc"
-        fi
-    else
-        echo -e "\nif [ -f ~/.bashrc ]; then\n    source ~/.bashrc\nfi" >> "$HOME/.bash_profile"
-        echo -e "📦 [KDE Plasma Detected] Membuat file ~/.bash_profile baru"
-    fi
+else
+    echo "✅ Konfigurasi 'one' sudah terdaftar di ~/.bashrc, melewati penyuntikan."
 fi
 
-# KONDISI B: Jika temanmu ternyata pakai ZSH
-if [ -f "$HOME/.zshrc" ]; then
-    if ! grep -q "one()" "$HOME/.zshrc"; then
-        echo "$BASH_ZSH_FUNCTION" >> "$HOME/.zshrc"
-        echo -e "✅ Fungsi 'one()' berhasil dipasang di ~/.zshrc (Zsh Detected!)"
-    fi
-fi
-
-# KONDISI C: Jika di masa depan ada yang pakai FISH SHELL
-if [ -d "$HOME/.config/fish" ] || command -v fish &> /dev/null; then
-    mkdir -p "$HOME/.config/fish/functions"
-    cat << 'EOF' > "$HOME/.config/fish/functions/one.fish"
-function one
-    set -x PYTHONPATH $HOME/rli-cli
-    python3 -m core.package_manager $argv
-end
-EOF
-    echo -e "✅ Fungsi 'one()' berhasil dipasang di fungsi kustom Fish Shell!"
-fi
-
-echo -e "${C_PINE}--------------------------------------------------${Ins_RESET}"
-echo -e "🎉 ${C_GOLD}Instalasi Selesai, Sayang! Proyekmu Kini 100% Universal!${C_RESET}"
-echo -e "💡 Minta temanmu untuk MEMBUKA ULANG terminalnya agar efeknya aktif."
-echo -e "${C_PINE}==================================================${C_RESET}"
+echo "===================================================================="
+echo " 💡 Silakan buka ulang terminal atau jalankan 'source ~/.bashrc' agar efeknya aktif."
+echo "===================================================================="
