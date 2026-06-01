@@ -1,4 +1,3 @@
-```markdown
 # 🚀 One-CLI (Universal Package & System Assistant)
 
 Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python dan Shell Script untuk mengotomatisasi manajemen paket, penyegaran repositori, ekstraksi arsip lintas format, hingga penarikan spesifikasi sistem yang estetik ala palet warna **Rosé Pine** di Linux (Ubuntu GNOME & KDE Plasma).
@@ -50,8 +49,6 @@ Buka terminal, masuk ke folder proyek, dan berikan izin eksekusi pada skrip `ins
 ```bash
 cd ~/one
 chmod +x install.sh
-
-```
 
 ### Langkah 3: Jalankan Skrip Installer
 
