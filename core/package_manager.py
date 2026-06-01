@@ -10,6 +10,7 @@ from core.package_utils import PackageUtils
 from core.system_manager import SystemManager
 from core.extract_manager import ExtractManager
 from core.file_manager import FileManager
+from core.update_manager import UpdateManager
 
 class PackageManager:
     def __init__(self):
@@ -22,6 +23,7 @@ class PackageManager:
         self.system_monitor = SystemManager()
         self.extractor = ExtractManager()
         self.file_handler = FileManager()
+        self.update_manager = UpdateManager()
         
         # Kode warna khusus untuk tampilan lokal
         self.C_PINE = "\033[36m"
@@ -287,6 +289,9 @@ if __name__ == '__main__':
                 fixed_name = manager.utils.fix_typo_or_alias(arg2)
                 print(f"🚀 Memulai instalasi paket dari repositori untuk: '{fixed_name}'...")
                 subprocess.run(["sudo", "apt-get", "install", "-y", fixed_name])
+
+        elif command == "update":
+            manager.update_manager.check_and_update()
 
         elif command == "extract" and len(sys.argv) > 2:
             archive_file = sys.argv[2]
