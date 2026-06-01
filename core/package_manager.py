@@ -12,6 +12,7 @@ from core.extract_manager import ExtractManager
 from core.file_manager import FileManager
 from core.update_manager import UpdateManager
 from core.fetch_manager import FetchManager
+from core.upgrade_manager import UpgradeManager
 
 class PackageManager:
     def __init__(self):
@@ -26,6 +27,7 @@ class PackageManager:
         self.file_handler = FileManager()
         self.update_manager = UpdateManager()
         self.fetch_manager = FetchManager()
+        self.upgrade_manager = UpgradeManager()
         
         # Kode warna khusus untuk tampilan lokal
         self.C_PINE = "\033[36m"
@@ -312,6 +314,9 @@ if __name__ == '__main__':
 
         elif command == "fetch":
             manager.fetch_manager.show_fetch()
+
+        elif command == "upgrade":
+            manager.upgrade_manager.pull_latest_code()
             
         else:
             # Jika argumen yang dimasukkan salah atau kurang (misal ketik 'one install' tanpa nama aplikasi)

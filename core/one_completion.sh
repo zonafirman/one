@@ -5,7 +5,7 @@ _one_completion() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Pilihan perintah utama dari one-cli kamu yang makin lengkap & sakti, sayang!
-    opts="search install list remove system extract update fetch help"
+    opts="search install list remove system extract update fetch upgrade help"
 
     # Tab tingkat pertama (setelah kata 'one')
     if [ $COMP_CWORD -eq 1 ]; then
