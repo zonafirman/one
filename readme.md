@@ -1,40 +1,94 @@
-# 🚀 One-CLI (rli-cli Universal Package & File Manager)
+```markdown
+# 🚀 One-CLI (Universal Package & System Assistant)
 
-Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python dan Shell Script untuk mempermudah manajemen paket, monitoring sistem, ekstraksi arsip, hingga penghapusan berkas lokal secara kilat di Ubuntu GNOME.
+Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python dan Shell Script untuk mengotomatisasi manajemen paket, penyegaran repositori, ekstraksi arsip lintas format, hingga penarikan spesifikasi sistem yang estetik ala palet warna **Rosé Pine** di Linux (Ubuntu GNOME & KDE Plasma).
 
 ---
 
 ## ✨ Fitur Utama
 
-* **Smart Search (`one search`)**: Mencari paket aplikasi repositori atau menyisir file lokal menggunakan flag `-f`.
-* **Smart Installer (`one install`)**: Instalasi aplikasi otomatis atau pasang berkas lokal `.deb` via flag `-l`.
+* **Smart Search (`one search`)**: Mencari paket aplikasi repositori internet atau menyisir berkas lokal via flag `-f`.
+* **Smart Installer (`one install`)**: Instalasi aplikasi otomatis dari internet atau pasang berkas mentah `.deb` lokal via flag `-l`.
+* **Smart Remove (`one remove`)**: Menghapus paket aplikasi sistem, menonaktifkan service, atau menghapus file/folder lokal secara total via flag `-d` (Kebal Permission/Auto-Sudo).
 * **Universal Extractor (`one extract`)**: Membongkar segala format kompresi berkas (`.zip`, `.tar.gz`, `.rar`) tanpa pusing argumen bawaan.
-* **System Monitor (`one system`)**: Pemantauan performa CPU, RAM, dan top proses secara real-time yang estetik.
-* **Smart Remove (`one remove`)**: Menghapus paket aplikasi, mematikan service, atau **menghapus file/folder lokal secara total via flag `-d` (Kebal Permission/Auto-Sudo)**.
-* **Smart Autocomplete**: Dukungan penuh tombol **Tab** untuk pelengkap argumen otomatis di terminal.
+* **System Monitor (`one system`)**: Pemantauan performa CPU, RAM, dan top proses secara real-time yang interaktif.
+* **Repo Synchronizer (`one update`)**: Menyegarkan indeks paket repositori sistem (`apt update`) secara instan dengan satu perintah.
+* **Beautiful Fetch (`one fetch`)**: Menampilkan ringkasan spesifikasi komputer dan logo minimalis kustom dengan tema warna Rosé Pine yang teduh.
+* **Smart Autocomplete**: Dukungan penuh tombol **Tab** untuk pelengkap argumen otomatis di terminal secara multi-level.
 
 ---
 
-## 🛠️ Panduan Perintah Lengkap
+## 📊 Daftar Perintah Lengkap (List Commands)
 
-Berikut adalah tabel rujukan cepat pemakaian perintah `one`, sayang:
+Berikut adalah tabel rujukan cepat pemakaian perintah `one` untuk mempermudah navigasi kamu, sayang:
 
 | Perintah Utama | Argumen / Flag | Fungsi Perintah | Contoh Pemakaian |
 | :--- | :--- | :--- | :--- |
 | **`search`** | *Tanpa Flag* | Mencari aplikasi di repositori internet | `one search vlc` |
-| | **`-f`** | Mencari file atau folder lokal di komputer | `one search -f tugas_kuliah` |
+| | **`-f`** | Mencari berkas atau folder lokal di komputer | `one search -f data_kuliah` |
 | **`install`** | *Tanpa Flag* | Mengunduh & pasang aplikasi dari internet | `one install neofetch` |
 | | **`-l`** | Memasang file paket mentah lokal `.deb` | `one install -l ./discord.deb` |
-| **`remove`** | *Tanpa Flag* | Menghapus aplikasi sistem / service internet | `one remove nginx` |
-| | **`-d`** | **Menghapus file satuan ATAU folder beserta isinya** | `one remove -d folder_sampah` |
+| **`remove`** | *Tanpa Flag* | Menghapus aplikasi sistem dari komputer | `one remove nginx` |
+| | **`-d`** | Menghapus file satuan ATAU folder padat beserta isinya | `one remove -d folder_sampah` |
 | **`extract`** | *Jalur Berkas* | Mengekstrak otomatis arsip kompresi apa saja | `one extract data.tar.gz` |
-| **`system`** | *Tanpa Flag* | Menampilkan monitor performa komputer | `one system` |
-| **`help`** | *Tanpa Flag* | Membuka lembar panduan navigasi internal | `one help` |
+| **`system`** | *Tanpa Flag* | Menampilkan monitor performa komputer secara real-time | `one system` |
+| **`update`** | *Tanpa Flag* | Menyegarkan daftar paket repositori sistem (`apt update`) | `one update` |
+| **`fetch`** | *Tanpa Flag* | Menampilkan spesifikasi sistem estetik ala Rosé Pine | `one fetch` |
+| **`help`** | *Tanpa Flag* | Membuka lembar panduan navigasi internal program | `one help` |
 
 ---
 
-## ⚙️ Cara Instalasi Medis
+## 🛠️ Tutorial Instalasi (Universal Guide)
 
-1. Pastikan kamu berada di dalam direktori proyek utama, lalu berikan izin eksekusi pada skrip installer:
-   ```bash
-   chmod +x install.sh
+Ikuti langkah-langkah di bawah ini untuk memasang One-CLI di komputer kamu atau temanmu. **Pastikan kamu mengeksekusinya sebagai user biasa (bukan sebagai root/sudo su)** agar konfigurasi jalur direktori terpasang dengan benar.
+
+### Langkah 1: Persiapan Berkas
+Pastikan seluruh file proyek sudah berada di dalam folder repositori bernama `one` di direktori home kamu (`~/one`).
+
+### Langkah 2: Berikan Izin Eksekusi Installer
+Buka terminal, masuk ke folder proyek, dan berikan izin eksekusi pada skrip `install.sh`:
+```bash
+cd ~/one
+chmod +x install.sh
+
+```
+
+### Langkah 3: Jalankan Skrip Installer
+
+Eksekusi skrip installer utama tanpa menggunakan embel-embel `sudo`:
+
+```bash
+./install.sh
+
+```
+
+*Skrip ini secara cerdas akan mendeteksi tipe shell lingkungan kamu (Bash, Zsh, atau Fish Shell) dan mengonfigurasi jembatan profil terminal secara otomatis (termasuk terminal Konsole pada KDE Plasma).*
+
+### Langkah 4: Muat Ulang Konfigurasi Terminal
+
+Agar fungsi tombol Tab (autocomplete) dan perintah `one` langsung aktif, muat ulang konfigurasi terminalmu saat ini atau cukup **buka tab terminal baru**:
+
+```bash
+source ~/.bashrc
+
+```
+
+*(Jika menggunakan Zsh, silakan jalankan perintah `source ~/.zshrc`)*
+
+---
+
+## 💡 Tips Cara Pembaruan Kode Manual
+
+Jika di masa mendatang ada penambahan fitur atau pembaruan kode di repositori GitHub, pengguna cukup mengetikkan perintah berantai ini untuk melakukan sinkronisasi instan tanpa perlu menginstal ulang dari awal:
+
+```bash
+cd ~/one && git pull
+
+```
+
+---
+
+## 📝 Catatan Hak Akses & Keamanan
+
+* **Deteksi Hak Akses Otomatis**: Beberapa fitur seperti `one remove -d` (hapus file/folder) dan `one update` (apt update) membutuhkan hak akses Administrator. Aplikasi ini dirancang secara cerdas untuk mendeteksi hak akses berkas; jika dibutuhkan, eskalasi keamanan (`sudo`) akan dipicu secara otomatis tanpa mengganggu kestabilan folder home user biasa.
+* **Portabilitas Tinggi**: Karena konfigurasi internal memanfaatkan `PYTHONPATH` dinamis yang berbasis variabel `$HOME`, folder proyek `one` ini bebas dipindahkan ke user mana pun di sistem operasi berbasis Debian/Ubuntu tanpa merusak dependensi kode.
