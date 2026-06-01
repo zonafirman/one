@@ -6,10 +6,10 @@ C_GOLD="\033[33m"
 C_RESET="\033[0m"
 
 echo -e "${C_PINE}==================================================${C_RESET}"
-echo -e "🚀  ${C_GOLD}Memulai Instalasi rli-cli (One-CLI) Universal${C_RESET}"
+echo -e "🚀  ${C_GOLD}Memulai Instalasi One-CLI Multi-Shell Universal${C_RESET}"
 echo -e "${C_PINE}==================================================${C_RESET}"
 
-# 1. Tentukan direktori target menggunakan variabel $HOME bawaan Linux, sayang
+# 1. Tentukan direktori target menggunakan folder $HOME user aktif
 TARGET_DIR="$HOME/rli-cli"
 CORE_DIR="$TARGET_DIR/core"
 
@@ -26,14 +26,13 @@ cp core/extract_manager.py "$CORE_DIR/"
 cp core/file_manager.py "$CORE_DIR/"       
 cp core/one_completion.sh "$CORE_DIR/"
 
-# 3. Menyuntikkan fungsi shell universal yang kamu minta ke .bashrc
-echo -e "📝 Mengonfigurasi fungsi eksekusi utama di .bashrc..."
-if ! grep -q "one()" "$HOME/.bashrc"; then
-    cat << 'EOF' >> "$HOME/.bashrc"
+echo -e "🔍 Mendeteksi lingkungan shell di komputer ini..."
 
-# Custom Command buat rli-cli Universal Package Manager (Support All Users)
+# Logika fungsi utama yang akan disuntikkan (untuk Bash & Zsh)
+BASH_ZSH_FUNCTION=$(cat << 'EOF'
+
+# Custom Command buat rli-cli Universal Package Manager
 one() {
-    # Menggunakan PYTHONPATH dinamis berbasis folder $HOME user aktif, sayang
     PYTHONPATH="$HOME/rli-cli" python3 -m core.package_manager "$@"
 }
 
@@ -42,16 +41,50 @@ if [ -f "$HOME/rli-cli/core/one_completion.sh" ]; then
     source "$HOME/rli-cli/core/one_completion.sh"
 fi
 EOF
-    echo -e "✅ Fungsi shell universal 'one()' berhasil disuntikkan ke .bashrc!"
-else
-    echo -e "ℹ️  Fungsi 'one()' sudah terkonfigurasi sebelumnya di .bashrc."
+)
+
+# 3. PROSES SUNTIK OTOMATIS BERDASARKAN SHELL YANG AKTIF, SAYANG
+
+# KONDISI A: Konfigurasi untuk BASH (Termasuk penanganan khusus KDE Plasma Profile)
+if [ -f "$HOME/.bashrc" ]; then
+    if ! grep -q "one()" "$HOME/.bashrc"; then
+        echo "$BASH_ZSH_FUNCTION" >> "$HOME/.bashrc"
+        echo -e "✅ Fungsi 'one()' berhasil dipasang di ~/.bashrc"
+    fi
+    
+    # TRICK KHUSUS KDE PLASMA: Pastikan Konsole membaca .bashrc via .bash_profile
+    if [ -f "$HOME/.bash_profile" ]; then
+        if ! grep -q "bashrc" "$HOME/.bash_profile"; then
+            echo -e "\nif [ -f ~/.bashrc ]; then\n    source ~/.bashrc\nfi" >> "$HOME/.bash_profile"
+            echo -e "📦 [KDE Plasma Detected] Menghubungkan .bash_profile ke .bashrc"
+        fi
+    else
+        echo -e "\nif [ -f ~/.bashrc ]; then\n    source ~/.bashrc\nfi" >> "$HOME/.bash_profile"
+        echo -e "📦 [KDE Plasma Detected] Membuat file ~/.bash_profile baru"
+    fi
 fi
 
-# 4. Segarkan konfigurasi terminal aktif secara senyap
-echo -e "🔄 Menyegarkan sistem autocomplete Bash..."
-source "$HOME/.bashrc" 2>/dev/null
+# KONDISI B: Jika temanmu ternyata pakai ZSH
+if [ -f "$HOME/.zshrc" ]; then
+    if ! grep -q "one()" "$HOME/.zshrc"; then
+        echo "$BASH_ZSH_FUNCTION" >> "$HOME/.zshrc"
+        echo -e "✅ Fungsi 'one()' berhasil dipasang di ~/.zshrc (Zsh Detected!)"
+    fi
+fi
 
-echo -e "${C_PINE}--------------------------------------------------${C_RESET}"
-echo -e "🎉 ${C_GOLD}Instalasi Selesai, Sayang! One-CLI Resmi Jadi Universal!${C_RESET}"
-echo -e "💡 Cobalah ketik: ${C_PINE}one help${C_RESET} di terminal kamu."
+# KONDISI C: Jika di masa depan ada yang pakai FISH SHELL
+if [ -d "$HOME/.config/fish" ] || command -v fish &> /dev/null; then
+    mkdir -p "$HOME/.config/fish/functions"
+    cat << 'EOF' > "$HOME/.config/fish/functions/one.fish"
+function one
+    set -x PYTHONPATH $HOME/rli-cli
+    python3 -m core.package_manager $argv
+end
+EOF
+    echo -e "✅ Fungsi 'one()' berhasil dipasang di fungsi kustom Fish Shell!"
+fi
+
+echo -e "${C_PINE}--------------------------------------------------${Ins_RESET}"
+echo -e "🎉 ${C_GOLD}Instalasi Selesai, Sayang! Proyekmu Kini 100% Universal!${C_RESET}"
+echo -e "💡 Minta temanmu untuk MEMBUKA ULANG terminalnya agar efeknya aktif."
 echo -e "${C_PINE}==================================================${C_RESET}"
