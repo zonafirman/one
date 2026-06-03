@@ -5,7 +5,7 @@ _one_completion() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Pilihan perintah utama dari one-cli kamu yang makin lengkap & sakti, sayang!
-    opts="search install list remove system extract update fetch upgrade help"
+    opts="search install list remove system extract update fetch upgrade help doctor clean speedtest ping"
 
     # Tab tingkat pertama (setelah kata 'one')
     if [ $COMP_CWORD -eq 1 ]; then
@@ -26,6 +26,10 @@ _one_completion() {
                 ;;
             remove)
                 COMPREPLY=( $(compgen -W "-d" -- ${cur}) )
+                return 0
+                ;;
+            clean)
+                COMPREPLY=( $(compgen -W "--all" -- ${cur}) )
                 return 0
                 ;;
             *)

@@ -13,6 +13,12 @@ from core.file_manager import FileManager
 from core.update_manager import UpdateManager
 from core.fetch_manager import FetchManager
 from core.upgrade_manager import UpgradeManager
+from core.doctor_manager import DoctorManager
+from core.clean_manager import CleanManager
+from core.search_manager import SearchManager
+from core.install_manager import InstallManager
+from core.ping_manager import PingManager
+from core.speed_manager import SpeedManager
 
 class PackageManager:
     def __init__(self):
@@ -28,7 +34,13 @@ class PackageManager:
         self.update_manager = UpdateManager()
         self.fetch_manager = FetchManager()
         self.upgrade_manager = UpgradeManager()
-        
+        self.doctor_manager = DoctorManager()
+        self.clean_manager = CleanManager()
+        self.search_manager = SearchManager()
+        self.install_manager = InstallManager()
+        self.ping_manager = PingManager()
+        self.speed_manager = SpeedManager()
+
         # Kode warna khusus untuk tampilan lokal
         self.C_PINE = "\033[36m"
         self.C_GOLD = "\033[33m"
@@ -254,45 +266,20 @@ if __name__ == '__main__':
                 print(f"❌ Argumen -f membutuhkan nama file atau folder yang dicari, sayang.")
                 print(f"💡 Contoh: one search -f dokumen.txt")
                 
-            else:
-                # Jika tidak pakai -f, maka dia mencari paket aplikasi biasa seperti kemarin
+            else:                # Jika tidak pakai argumen -f, jalankan pencarian paket aplikasi seperti biasa
                 fixed_name = manager.utils.fix_typo_or_alias(arg2)
-                print(f"🔍 Mencari paket aplikasi untuk: '{fixed_name}'...")
-                subprocess.run(["apt-cache", "search", fixed_name])
+                manager.search_manager.unified_search(fixed_name)
             
-        elif command == "install" and len(sys.argv) > 2:
-            arg2 = sys.argv[2]
-            
-            # SINKRONISASI: Menggunakan argumen -l untuk instalasi file LOKAL .deb, sayang!
-            if arg2 == "-l" and len(sys.argv) > 3:
-                file_path = sys.argv[3]
-                
-                # Pastikan file tersebut beneran ada di komputer kamu
-                if os.path.exists(file_path):
-                    print(f"📦 {manager.C_PINE}Mendeteksi perintah instalasi file lokal...{manager.C_RESET}")
-                    print(f"🚀 Memasang file lokal: '{os.path.basename(file_path)}'...")
-                    
-                    # Ambil path absolut agar apt-get tidak bingung mencari lokasinya
-                    abs_path = os.path.abspath(file_path)
-                    result = subprocess.run(["sudo", "apt-get", "install", "-y", abs_path])
-                    
-                    if result.returncode == 0:
-                        print(f"\n🎉 File '{os.path.basename(file_path)}' sukses terpasang di sistem kamu, sayang!")
-                    else:
-                        print(f"\n❌ Gagal menginstal file lokal. Periksa kembali dependensi sistem kamu, sayang.")
-                else:
-                    print(f"❌ File '{file_path}' tidak ditemukan di lokasi tersebut, sayang.")
-                    print(f"💡 Contoh: one install -l ./aplikasi.deb")
-                    
-            elif arg2 == "-l" and len(sys.argv) <= 3:
-                print(f"❌ Argumen -l membutuhkan jalur file (.deb) lokal yang ingin diinstal, sayang.")
-                print(f"💡 Contoh: one install -l ./discord.deb")
-                
+        elif command == "install":
+            if len(sys.argv) > 2:
+                pkg_target = sys.argv[2]
+                # Perbaiki typo atau alias otomatis dulu jika ada
+                fixed_name = manager.utils.fix_typo_or_alias(pkg_target)
+
+                # Panggil modul installer pintar kita!
+                manager.install_manager.smart_install(fixed_name)
             else:
-                # Jika tidak pakai argumen -l, pasang aplikasi dari repositori internet seperti biasa
-                fixed_name = manager.utils.fix_typo_or_alias(arg2)
-                print(f"🚀 Memulai instalasi paket dari repositori untuk: '{fixed_name}'...")
-                subprocess.run(["sudo", "apt-get", "install", "-y", fixed_name])
+                print("\033[38;2;235;111;145m❌ Masukkan nama paket yang ingin dipasang, sayang! Contoh: one install vlc\033[0m")
 
         elif command == "update":
             manager.update_manager.check_and_update()
@@ -314,6 +301,18 @@ if __name__ == '__main__':
 
         elif command == "fetch":
             manager.fetch_manager.show_fetch()
+
+        elif command == "doctor":
+            manager.doctor_manager.run_diagnose()
+
+        elif command == "clean":
+            manager.clean_manager.execute_clean()
+
+        elif command == "ping":
+            manager.ping_manager.execute_ping()
+        
+        elif command == "speedtest":
+            manager.speed_manager.execute_speedtest()
 
         elif command == "upgrade":
             manager.upgrade_manager.pull_latest_code()

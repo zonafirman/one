@@ -1,6 +1,6 @@
-# 🚀 One-CLI (Universal Package & System Assistant)
+# 🚀 One-CLI (Universal Package, Network & System Assistant)
 
-Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python dan Shell Script untuk mengotomatisasi manajemen paket, penyegaran repositori, ekstraksi arsip lintas format, hingga penarikan spesifikasi sistem yang estetik ala palet warna **Rosé Pine** di Linux (Ubuntu GNOME & KDE Plasma).
+Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python dan Shell Script untuk mengotomatisasi manajemen paket, penyegaran repositori, ekstraksi arsip lintas format, pengujian latensi serta kecepatan internet, hingga penarikan spesifikasi sistem yang interaktif dan estetik ala palet warna **Rosé Pine** di Linux (Ubuntu GNOME & KDE Plasma).
 
 ---
 
@@ -10,10 +10,34 @@ Aplikasi berbasis Terminal (CLI) super asisten yang dirancang menggunakan Python
 * **Smart Installer (`one install`)**: Instalasi aplikasi otomatis dari internet atau pasang berkas mentah `.deb` lokal via flag `-l`.
 * **Smart Remove (`one remove`)**: Menghapus paket aplikasi sistem, menonaktifkan service, atau menghapus file/folder lokal secara total via flag `-d` (Kebal Permission/Auto-Sudo).
 * **Universal Extractor (`one extract`)**: Membongkar segala format kompresi berkas (`.zip`, `.tar.gz`, `.rar`) tanpa pusing argumen bawaan.
-* **System Monitor (`one system`)**: Pemantauan performa CPU, RAM, dan top proses secara real-time yang interaktif.
+* **Premium System Monitor (`one system`)**: Pemantauan performa CPU, RAM, kapasitas DISK, dan daftar proses berjalan secara real-time yang interaktif (TUI) dengan desain berbingkai premium dan fitur *zebra-striping* warna Rosé Pine.
+* **Network Ping Tester (`one ping`)**: Menguji latensi koneksi jaringan secara berkala ke server global dengan tampilan grafik mini yang bersih.
+* **Smart Internet Speedtest (`one speedtest`)**: Mengukur kecepatan unduh (*download*) dan unggah (*upload*) internet secara akurat langsung dari kernel terminal dengan antarmuka yang ramah.
 * **Repo Synchronizer (`one update`)**: Menyegarkan indeks paket repositori sistem (`apt update`) secara instan dengan satu perintah.
 * **Beautiful Fetch (`one fetch`)**: Menampilkan ringkasan spesifikasi komputer dan logo minimalis kustom dengan tema warna Rosé Pine yang teduh.
 * **Smart Autocomplete**: Dukungan penuh tombol **Tab** untuk pelengkap argumen otomatis di terminal secara multi-level.
+
+---
+
+## 📊 Daftar Perintah Lengkap (List Commands)
+
+Berikut adalah tabel rujukan cepat pemakaian perintah `one` untuk mempermudah navigasi kamu, sayang:
+
+| Perintah Utama | Argumen / Flag | Fungsi Perintah | Contoh Pemakaian |
+| :--- | :--- | :--- | :--- |
+| **`search`** | *Tanpa Flag* | Mencari aplikasi di repositori internet | `one search vlc` |
+| | **`-f`** | Mencari berkas atau folder lokal di komputer | `one search -f data_kuliah` |
+| **`install`** | *Tanpa Flag* | Mengunduh & pasang aplikasi dari internet | `one install neofetch` |
+| | **`-l`** | Memasang file paket mentah lokal `.deb` | `one install -l ./discord.deb` |
+| **`remove`** | *Tanpa Flag* | Menghapus aplikasi sistem dari komputer | `one remove nginx` |
+| | **`-d`** | Menghapus file satuan ATAU folder padat beserta isinya | `one remove -d folder_sampah` |
+| **`extract`** | *Jalur Berkas* | Mengekstrak otomatis arsip kompresi apa saja | `one extract data.tar.gz` |
+| **`system`** | *Tanpa Flag* | Menampilkan monitor performa komputer real-time interaktif (Q untuk keluar) | `one system` |
+| **`ping`** | *Tanpa Flag* | Melakukan tes latensi jaringan ke server DNS utama | `one ping` |
+| **`speedtest`** | *Tanpa Flag* | Menguji kecepatan unduh & unggah internet secara *real-time* | `one speedtest` |
+| **`update`** | *Tanpa Flag* | Menyegarkan daftar paket repositori sistem (`apt update`) | `one update` |
+| **`fetch`** | *Tanpa Flag* | Menampilkan spesifikasi sistem estetik ala Rosé Pine | `one fetch` |
+| **`help`** | *Tanpa Flag* | Membuka lembar panduan navigasi internal program | `one help` |
 
 ---
 
@@ -49,7 +73,7 @@ Buka terminal, masuk ke folder proyek, dan berikan izin eksekusi pada skrip `ins
 ```bash
 cd ~/one
 chmod +x install.sh
-
+```
 ### Langkah 3: Jalankan Skrip Installer
 
 Eksekusi skrip installer utama tanpa menggunakan embel-embel `sudo`:

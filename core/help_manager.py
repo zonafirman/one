@@ -32,8 +32,12 @@ class HelpManager:
         print(f"   ├─ one remove <nama package>         -> Menghapus paket aplikasi yang terinstal.")
         print(f"   └─ one remove -d <nama>              -> Menghapus file atau folder secara permanen.")
         print(f"  {self.C_PINE}system{self.C_RESET}     : Menampilkan visualisasi performa sistem (CPU, RAM, DISK) secara real-time.")
-        print(f"  {self.C_PINE}fetch{self.C_RESET}      -> Menampilkan spesifikasi sistem.")
+        print(f"  {self.C_PINE}fetch{self.C_RESET}      : Menampilkan spesifikasi sistem.")
+        print(f"  {self.C_PINE}doctor{self.C_RESET}     : Diagnosa kesehatan hardware, ruang disk, & integritas berkas")
+        print(f"  {self.C_PINE}clean{self.C_RESET}      : Membersihkan cache paket, sampah APT, & log lama (Butuh Sudo)")
         print(f"  {self.C_PINE}extract{self.C_RESET}    : Mengekstrak berbagai format arsip (zip, tar, rar, 7z) secara otomatis.")
+        print(f"  {self.C_PINE}ping{self.C_RESET}       : Memeriksa kualitas koneksi internet dan latensi latency")
+        print(f"  {self.C_PINE}speedtest{self.C_RESET}  : Menguji kecepatan internet (Download & Upload)")
         print(f"  {self.C_PINE}upgrade{self.C_RESET}    : Memperbarui One-CLI ke versi terbaru.")
         print(f"  {self.C_PINE}help{self.C_RESET}       : Menampilkan menu bantuan.")
         
