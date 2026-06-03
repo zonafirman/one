@@ -41,26 +41,6 @@ Berikut adalah tabel rujukan cepat pemakaian perintah `one` untuk mempermudah na
 
 ---
 
-## 📊 Daftar Perintah Lengkap (List Commands)
-
-Berikut adalah tabel rujukan cepat pemakaian perintah `one` untuk mempermudah navigasi kamu, sayang:
-
-| Perintah Utama | Argumen / Flag | Fungsi Perintah | Contoh Pemakaian |
-| :--- | :--- | :--- | :--- |
-| **`search`** | *Tanpa Flag* | Mencari aplikasi di repositori internet | `one search vlc` |
-| | **`-f`** | Mencari berkas atau folder lokal di komputer | `one search -f data_kuliah` |
-| **`install`** | *Tanpa Flag* | Mengunduh & pasang aplikasi dari internet | `one install neofetch` |
-| | **`-l`** | Memasang file paket mentah lokal `.deb` | `one install -l ./discord.deb` |
-| **`remove`** | *Tanpa Flag* | Menghapus aplikasi sistem dari komputer | `one remove nginx` |
-| | **`-d`** | Menghapus file satuan ATAU folder padat beserta isinya | `one remove -d folder_sampah` |
-| **`extract`** | *Jalur Berkas* | Mengekstrak otomatis arsip kompresi apa saja | `one extract data.tar.gz` |
-| **`system`** | *Tanpa Flag* | Menampilkan monitor performa komputer secara real-time | `one system` |
-| **`update`** | *Tanpa Flag* | Menyegarkan daftar paket repositori sistem (`apt update`) | `one update` |
-| **`fetch`** | *Tanpa Flag* | Menampilkan spesifikasi sistem estetik ala Rosé Pine | `one fetch` |
-| **`help`** | *Tanpa Flag* | Membuka lembar panduan navigasi internal program | `one help` |
-
----
-
 ## 🛠️ Tutorial Instalasi (Universal Guide)
 
 Ikuti langkah-langkah di bawah ini untuk memasang One-CLI di komputer kamu atau temanmu. **Pastikan kamu mengeksekusinya sebagai user biasa (bukan sebagai root/sudo su)** agar konfigurasi jalur direktori terpasang dengan benar.
