@@ -28,7 +28,13 @@ class HelpManager(BaseManager):
             "ip": "Tampilkan IP lokal, publik, dan detail ISP.",
             "kill": "Matikan proses berdasarkan nama atau nomor Port.",
             "history": "Tampilkan riwayat perintah one-cli (--clear untuk hapus).",
-            "tree": "Tampilkan struktur direktori dalam format pohon."
+            "tree": "Tampilkan struktur direktori dalam format pohon.",
+            "disk": "Analisis partisi disk dan temukan folder terbesar.",
+            "ssh": "Manajemen kunci SSH (generate & list).",
+            "cron": "Tampilkan jadwal tugas otomatis (Cron Jobs).",
+            "users": "Audit pengguna sistem dan sesi login aktif.",
+            "env": "Tampilkan atau cari environment variables sistem.",
+            "dns": "Lakukan resolusi DNS/IP untuk sebuah domain."
         }
         for k, v in cmds.items():
             print(f"  {self.C_CYAN}{k:<10}{self.C_RESET} : {v}")

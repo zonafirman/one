@@ -46,6 +46,12 @@ Asisten Terminal (CLI) serbaguna yang dirancang dengan Python untuk mengotomatis
 | **`kill`** | *Nama / Port* | Matikan proses berdasarkan nama atau Port | `one kill 8080` |
 | **`history`** | *Tanpa Flag* | Tampilkan riwayat perintah yang dijalankan | `one history` |
 | **`tree`** | *[Path]* | Tampilkan struktur direktori dalam format pohon | `one tree /var/log` |
+| **`disk`** | *Tanpa Flag* | Analisis partisi dan temukan folder ukuran raksasa | `one disk` |
+| **`ssh`** | *[generate]* | Kelola dan buat kunci SSH (Ed25519) dengan aman | `one ssh generate` |
+| **`cron`** | *Tanpa Flag* | Lihat daftar jadwal *cron jobs* untuk user saat ini | `one cron` |
+| **`users`** | *Tanpa Flag* | Audit pengguna sistem dan sesi login aktif | `one users` |
+| **`env`** | *[Query]* | Tampilkan atau cari environment variables sistem | `one env PATH` |
+| **`dns`** | *Domain* | Lakukan resolusi DNS/IP untuk sebuah domain | `one dns github.com` |
 ---
 
 ## 🛠️ Panduan Instalasi & Pembaruan

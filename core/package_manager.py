@@ -17,8 +17,12 @@ class PackageManager(BaseManager):
             "logs": ("log_manager", "LogManager", "audit"),
             "system": ("system_manager", "SystemManager", "start"),
             "backup": ("backup_manager", "BackupManager", "execute_backup"),
+            "cron": ("cron_manager", "CronManager", "run"),
             "restore": ("backup_manager", "BackupManager", "execute_restore"),
             "doctor": ("doctor_manager", "DoctorManager", "run"),
+            "disk": ("disk_manager", "DiskManager", "run"),
+            "dns": ("dns_manager", "DnsManager", "run"),
+            "env": ("env_manager", "EnvManager", "run"),
             "extract": ("extract_manager", "ExtractManager", "run"),
             "fetch": ("fetch_manager", "FetchManager", "run"),
             "file": ("file_manager", "FileManager", "run"),
@@ -30,9 +34,11 @@ class PackageManager(BaseManager):
             "search": ("search_manager", "SearchManager", "run"),
             "security": ("security_manager", "SecurityManager", "run"),
             "service": ("service_manager", "ServiceManager", "run"),
+            "ssh": ("ssh_manager", "SshManager", "run"),
             "speedtest": ("speed_manager", "SpeedManager", "run"),
             "history": ("history_manager", "HistoryManager", "run"),
             "tree": ("tree_manager", "TreeManager", "run"),
+            "users": ("users_manager", "UsersManager", "run"),
         }
 
     def setup_parser(self):
