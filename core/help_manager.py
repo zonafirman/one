@@ -25,6 +25,8 @@ class HelpManager(BaseManager):
             "upgrade": "Tarik versi kode One-CLI terbaru dari Git.",
             "security": "Jalankan audit keamanan sistem (UFW, Ports, SSH).",
             "service": "Manajemen systemd service (start/stop/status).",
+            "ip": "Tampilkan IP lokal, publik, dan detail ISP.",
+            "kill": "Matikan proses berdasarkan nama atau nomor Port.",
             "history": "Tampilkan riwayat perintah one-cli (--clear untuk hapus).",
             "tree": "Tampilkan struktur direktori dalam format pohon."
         }

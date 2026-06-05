@@ -24,6 +24,8 @@ class PackageManager(BaseManager):
             "file": ("file_manager", "FileManager", "run"),
             "info": ("info_manager", "InfoManager", "run"),
             "install": ("install_manager", "InstallManager", "run"),
+            "ip": ("ip_manager", "IpManager", "run"),
+            "kill": ("kill_manager", "KillManager", "run"),
             "ports": ("network_manager", "NetworkManager", "show_listening_ports"),
             "search": ("search_manager", "SearchManager", "run"),
             "security": ("security_manager", "SecurityManager", "run"),

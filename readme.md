@@ -42,6 +42,8 @@ Asisten Terminal (CLI) serbaguna yang dirancang dengan Python untuk mengotomatis
 | **`ports`** | *Tanpa Flag* | Lihat port jaringan yang terbuka | `one ports` |
 | **`security`** | *Tanpa Flag* | Jalankan audit keamanan dasar pada sistem | `one security` |
 | **`service`** | *Aksi + Nama* | Kelola layanan systemd (start, stop, status) | `one service start nginx` |
+| **`ip`** | *Tanpa Flag* | Tampilkan informasi identitas IP Lokal & Publik | `one ip` |
+| **`kill`** | *Nama / Port* | Matikan proses berdasarkan nama atau Port | `one kill 8080` |
 | **`history`** | *Tanpa Flag* | Tampilkan riwayat perintah yang dijalankan | `one history` |
 | **`tree`** | *[Path]* | Tampilkan struktur direktori dalam format pohon | `one tree /var/log` |
 ---

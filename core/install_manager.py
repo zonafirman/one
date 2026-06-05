@@ -1,18 +1,13 @@
 # core/install_manager.py
 import subprocess
+import sys
 import shutil
+from core.base_manager import BaseManager
 
-class InstallManager:
+class InstallManager(BaseManager):
     def __init__(self):
-        self.C_ROSE    = "\033[35m"
-        self.C_PINE    = "\033[36m"
-        self.C_GOLD    = "\033[33m"
-        self.C_IRIS    = "\033[34m"
-        self.C_LOVE    = "\033[31m"
-        self.C_FOAM    = "\033[32m"
+        super().__init__()
         self.C_SUBTLE  = "\033[90m"
-        self.C_RESET   = "\033[0m"
-        self.C_BOLD    = "\033[1m"
 
     def _get_smart_suggestions(self, query):
         suggestions = []
@@ -43,28 +38,34 @@ class InstallManager:
         except: pass
         return suggestions[:5]
 
+    def run(self):
+        if len(sys.argv) < 3:
+            self.error("Usage: one install <package_name>")
+            return
+        self.smart_install(sys.argv[2])
+
     def smart_install(self, pkg_name):
         if not pkg_name:
-            print(f"  {self.C_LOVE}❌ Nama paket tidak boleh kosong.{self.C_RESET}")
+            self.error("Package name cannot be empty.")
             return
         if "." in pkg_name and shutil.which("flatpak"):
             subprocess.run(["flatpak", "install", "flathub", pkg_name, "-y"])
             return
 
-        print(f"\n{self.C_BOLD}{self.C_IRIS}📦 --- One-CLI Interactive Smart Installer ---{self.C_RESET}\n")
+        self.info(f"Searching for best candidates to install '{pkg_name}'...")
         choices = self._get_smart_suggestions(pkg_name)
         if not choices:
-            print(f"  {self.C_LOVE}❌ Paket '{pkg_name}' tidak ditemukan di repositori mana pun.{self.C_RESET}\n")
+            self.error(f"Package '{pkg_name}' not found in any registered repository.")
             return
 
-        print(f"  {self.C_BOLD}{self.C_SUBTLE}[ Silakan Pilih Paket Aplikasi Terdekat ]{self.C_RESET}")
+        print(f"\n  {self.C_BOLD}{self.C_SUBTLE}[ Select Package Source ]{self.C_RESET}")
         for idx, item in enumerate(choices, start=1):
-            c = self.C_GOLD if item['type']=="APT" else (self.C_FOAM if item['type']=="Flatpak" else self.C_ROSE)
+            c = self.C_YELLOW if item['type']=="APT" else (self.C_GREEN if item['type']=="Flatpak" else self.C_RED)
             print(f"      {c}{idx}. {item['id']:<40} [{item['type']}]{self.C_RESET}")
         print("")
         
         try:
-            inp = input(f"  {self.C_BOLD}{self.C_IRIS}❓ Pilih nomor aplikasi (1-{len(choices)} atau 'c' untuk batal): {self.C_RESET}").strip()
+            inp = input(f"  {self.C_CYAN}❓ Choose a number (1-{len(choices)} or 'c' to cancel): {self.C_RESET}").strip()
             if inp.lower() == 'c': return
             idx = int(inp) - 1
             if 0 <= idx < len(choices):
@@ -72,6 +73,6 @@ class InstallManager:
                 if t['type'] == "APT": subprocess.run(["sudo", "apt-get", "install", "-y", t['id']])
                 elif t['type'] == "Flatpak": subprocess.run(["flatpak", "install", "flathub", t['id'], "-y"])
                 elif t['type'] == "Snap": subprocess.run(["sudo", "snap", "install", t['id']])
-                print(f"\n  {self.C_FOAM}✅ Proses instalasi selesai.{self.C_RESET}\n")
-            else: print(f"\n  {self.C_LOVE}❌ Pilihan tidak valid.{self.C_RESET}")
-        except: print(f"\n  {self.C_LOVE}❌ Masukan tidak valid, harap gunakan angka.{self.C_RESET}")
+                self.success("Installation completed successfully.")
+            else: self.error("Invalid selection.")
+        except ValueError: self.error("Invalid input, please enter a valid number.")

@@ -2,38 +2,29 @@
 import os
 import shutil
 import getpass
+from core.base_manager import BaseManager
 
-class DoctorManager:
+class DoctorManager(BaseManager):
     def __init__(self):
+        super().__init__()
         self.target_root = "/"
-        self.C_ROSE    = "\033[35m"
-        self.C_PINE    = "\033[36m"
-        self.C_GOLD    = "\033[33m"
-        self.C_IRIS    = "\033[34m"
-        self.C_LOVE    = "\033[31m"
-        self.C_FOAM    = "\033[32m"
         self.C_SUBTLE  = "\033[90m"
-        self.C_RESET   = "\033[0m"
-        self.C_BOLD    = "\033[1m"
 
-    def run_diagnose(self):
-        print(f"\n{self.C_BOLD}{self.C_IRIS}🩺 --- One-CLI Advanced System Doctor Diagnostic ---{self.C_RESET}\n")
+    def run(self):
+        self.info("Running Advanced System Diagnostics...")
         
-        # 1. Privileges Check
-        print(f"  {self.C_SUBTLE}[1/4]{self.C_RESET} Memeriksa Otoritas Akses...")
-        print(f"      {self.C_GOLD}⚠️ Mode Root/Sudo Aktif." if os.geteuid()==0 else f"      {self.C_FOAM}✅ User Standar ({getpass.getuser()}). Aman.")
+        print(f"\n  {self.C_SUBTLE}[1/4]{self.C_RESET} Checking Privileges...")
+        print(f"      {self.C_YELLOW}⚠️ Running as Root/Sudo." if os.geteuid()==0 else f"      {self.C_GREEN}✅ Standard User ({getpass.getuser()}). Safe.")
 
-        # 2. Disk Usage Check
-        print(f"\n  {self.C_SUBTLE}[2/4]{self.C_RESET} Menganalisis Ruang Penyimpanan...")
+        print(f"\n  {self.C_SUBTLE}[2/4]{self.C_RESET} Analyzing Disk Space...")
         try:
             total, used, free = shutil.disk_usage(self.target_root)
             free_gb = free / (2**30)
-            print(f"      › Tersedia: {free_gb:.1f} GB dari {total/(2**30):.1f} GB")
-            print(f"      {self.C_LOVE}❌ Sisa ruang kritis!" if free_gb < 5 else f"      {self.C_FOAM}✅ Kapasitas lega.")
+            print(f"      › Available: {free_gb:.1f} GB of {total/(2**30):.1f} GB")
+            print(f"      {self.C_RED}❌ Critical low space!" if free_gb < 5 else f"      {self.C_GREEN}✅ Capacity optimal.")
         except: pass
 
-        # 3. CPU and Thermal Check
-        print(f"\n  {self.C_SUBTLE}[3/4]{self.C_RESET} Memantau Beban Kerja CPU & Thermal...")
+        print(f"\n  {self.C_SUBTLE}[3/4]{self.C_RESET} Monitoring CPU Load & Thermals...")
         try:
             load = os.getloadavg()
             print(f"      › Load Avg: {load[0]:.2f} (1m) | {load[1]:.2f} (5m)")
@@ -42,21 +33,21 @@ class DoctorManager:
                 if os.path.exists(path):
                     with open(path, "r") as f:
                         t = int(f.read().strip()) / 1000
-                        print(f"      › Suhu Inti: {t:.1f}°C")
+                        print(f"      › Core Temp: {t:.1f}°C")
                         temp_found = True
                         break
-            if not temp_found: print(f"      › Suhu Inti: N/A (WSL/Virtual Environment)")
+            if not temp_found: print(f"      › Core Temp: N/A (Virtual Environment)")
         except: pass
 
-        # 4. RAM Check
-        print(f"\n  {self.C_SUBTLE}[4/4]{self.C_RESET} Memverifikasi Pustaka & RAM...")
+        print(f"\n  {self.C_SUBTLE}[4/4]{self.C_RESET} Verifying RAM Availability...")
         try:
             with open("/proc/meminfo", "r") as f:
                 mem = {line.split(":")[0].strip(): int(line.split(":")[1].split()[0]) for line in f.readlines()}
             tot = mem.get("MemTotal", 0) // 1024
             avl = mem.get("MemAvailable", 0) // 1024
-            print(f"      › Utilisasi RAM: {tot-avl} MB / {tot} MB")
-            print(f"      {self.C_FOAM}✅ Alokasi stabil.")
+            print(f"      › RAM Usage: {tot-avl} MB / {tot} MB")
+            print(f"      {self.C_GREEN}✅ Allocation stable.")
         except: pass
 
-        print(f"\n{self.C_BOLD}{self.C_ROSE}✅ [ Diagnosa Selesai ] Sistem berjalan dalam batas normal.{self.C_RESET}\n")
+        print("")
+        self.success("Diagnostics complete. System operates within normal parameters.")

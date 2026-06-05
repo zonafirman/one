@@ -1,8 +1,8 @@
 # core/package_utils.py
 class PackageUtils:
     def __init__(self):
-        self.C_PINE = "\033[36m"
-        self.C_GOLD = "\033[33m"
+        self.C_CYAN = "\033[36m"
+        self.C_YELLOW = "\033[33m"
         self.C_RESET = "\033[0m"
         self.C_BOLD = "\033[1m"
 
@@ -47,14 +47,14 @@ class PackageUtils:
         package = package.lower().strip()
         if package in self.software_alternatives:
             replacement, reason = self.software_alternatives[package]
-            print(f"\n📢 {self.C_BOLD}[ SUGGESTION ALTERNATIF ]{self.C_RESET}")
-            print(f"   Aplikasi '{package}' sudah usang atau digantikan.")
-            print(f"   ℹ️  Alasan: {reason}")
-            print(f"   🔄 {self.C_PINE}one mengalihkan eksekusi ke: '{replacement}'{self.C_RESET}\n")
+            print(f"\n📢 {self.C_BOLD}[ ALTERNATIVE SUGGESTION ]{self.C_RESET}")
+            print(f"   The application '{package}' is deprecated or superseded.")
+            print(f"   ℹ️  Reason: {reason}")
+            print(f"   🔄 {self.C_CYAN}one-cli is redirecting to: '{replacement}'{self.C_RESET}\n")
             return replacement
 
         closest_match = self.find_closest_match(package)
         if closest_match and closest_match != package:
-            print(f"💡 {self.C_GOLD}[one-cli] Mengoreksi salah ketik '{package}' -> '{closest_match}'...{self.C_RESET}")
+            print(f"💡 {self.C_YELLOW}[one-cli] Correcting typo '{package}' -> '{closest_match}'...{self.C_RESET}")
             return closest_match
         return package
