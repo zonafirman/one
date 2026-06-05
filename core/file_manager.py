@@ -1,54 +1,44 @@
-# core/file_manager.py
 import os
+import sys
 import shutil
 import subprocess
+from core.base_manager import BaseManager
 
-class FileManager:
+class FileManager(BaseManager):
     def __init__(self):
-        self.C_PINE = "\033[36m"
-        self.C_RESET = "\033[0m"
+        super().__init__()
+
+    def run(self):
+        if len(sys.argv) < 3:
+            self.error("Usage: one file <path_to_delete>")
+            self.info("This command permanently deletes a file or directory.")
+            return
+        
+        raw_path = sys.argv[2]
+        self.delete_item(raw_path)
 
     def delete_item(self, raw_path: str):
-        """Fungsi universal untuk menghapus file atau folder secara aman & kebal permission, sayang"""
-        target_path = os.path.abspath(raw_path)
-        target_name = os.path.basename(target_path)
-        
-        if not os.path.exists(target_path):
-            print(f"❌ '{target_name}' tidak ditemukan di lokasi tersebut, sayang.")
+        target = os.path.abspath(raw_path)
+        name = os.path.basename(target)
+        if not os.path.exists(target):
+            self.error(f"Target not found: '{name}'")
             return
 
-        # KONDISI 1: JIKA TARGET ADALAH FOLDER
-        if os.path.isdir(target_path):
-            print(f"🗑️  {self.C_PINE}Mendeteksi perintah hapus folder...{self.C_RESET}")
-            print(f"⚠️  Menghapus folder: '{target_name}' beserta seluruh isinya...")
+        if os.path.isdir(target):
+            self.info(f"Deleting directory and its contents: '{name}'...")
             try:
-                shutil.rmtree(target_path)
-                print(f"\n🎉 Folder '{target_name}' berhasil dihapus total, sayang!")
+                shutil.rmtree(target)
+                self.success(f"Directory '{name}' successfully deleted.")
             except PermissionError:
-                # TRICK: Jika hak akses ditolak, otomatis pakai mode super user di latar belakang!
-                print(f"🔒 {self.C_PINE}Hak akses terbatas detected. Mencoba menghapus dengan akses sudo...{self.C_RESET}")
-                result = subprocess.run(["sudo", "rm", "-rf", target_path])
-                if result.returncode == 0:
-                    print(f"\n🎉 Folder '{target_name}' sukses dihapus menggunakan akses sudo, sayang!")
-                else:
-                    print(f"\n❌ Gagal menghapus folder bahkan dengan akses sudo.")
-            except Exception as e:
-                print(f"\n❌ Gagal menghapus folder: {e}")
-                
-        # KONDISI 2: JIKA TARGET ADALAH FILE BIASA
+                self.warn("Permission denied. Escalating with sudo...")
+                subprocess.run(["sudo", "rm", "-rf", target], check=True)
+                self.success(f"Directory '{name}' successfully deleted with root privileges.")
         else:
-            print(f"🗑️  {self.C_PINE}Mendeteksi perintah hapus file...{self.C_RESET}")
-            print(f"⚠️  Menghapus file: '{target_name}'...")
+            self.info(f"Deleting file: '{name}'...")
             try:
-                os.remove(target_path)
-                print(f"\n🎉 File '{target_name}' berhasil dihapus dari sistem, sayang!")
+                os.remove(target)
+                self.success(f"File '{name}' successfully deleted.")
             except PermissionError:
-                # TRICK: Otomatis pakai mode super user untuk file bandel
-                print(f"🔒 {self.C_PINE}Hak akses terbatas detected. Mencoba menghapus dengan akses sudo...{self.C_RESET}")
-                result = subprocess.run(["sudo", "rm", "-f", target_path])
-                if result.returncode == 0:
-                    print(f"\n🎉 File '{target_name}' sukses didepak menggunakan akses sudo, sayang!")
-                else:
-                    print(f"\n❌ Gagal menghapus file bahkan dengan akses sudo.")
-            except Exception as e:
-                print(f"\n❌ Gagal menghapus file: {e}")
+                self.warn("Permission denied. Escalating with sudo...")
+                subprocess.run(["sudo", "rm", "-f", target], check=True)
+                self.success(f"File '{name}' successfully deleted with root privileges.")

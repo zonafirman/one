@@ -1,332 +1,149 @@
-# core/package_manager.py
-import subprocess
-import os
-import sys
-import glob
-
-# Mengimpor modul internal core
+import sys, os, subprocess, time, argparse, importlib
 from core.help_manager import HelpManager
-from core.package_utils import PackageUtils
-from core.system_manager import SystemManager
-from core.extract_manager import ExtractManager
-from core.file_manager import FileManager
-from core.update_manager import UpdateManager
-from core.fetch_manager import FetchManager
-from core.upgrade_manager import UpgradeManager
-from core.doctor_manager import DoctorManager
-from core.clean_manager import CleanManager
-from core.search_manager import SearchManager
-from core.install_manager import InstallManager
-from core.ping_manager import PingManager
-from core.speed_manager import SpeedManager
+from core.base_manager import BaseManager
 
-class PackageManager:
+class PackageManager(BaseManager):
     def __init__(self):
-        self.system_apps_path = "/usr/share/applications/*.desktop"
-        self.user_apps_path = os.path.expanduser("~/.local/share/applications/*.desktop")
-        
-        # Inisialisasi helper dan utils
-        self.helper = HelpManager()
-        self.utils = PackageUtils()
-        self.system_monitor = SystemManager()
-        self.extractor = ExtractManager()
-        self.file_handler = FileManager()
-        self.update_manager = UpdateManager()
-        self.fetch_manager = FetchManager()
-        self.upgrade_manager = UpgradeManager()
-        self.doctor_manager = DoctorManager()
-        self.clean_manager = CleanManager()
-        self.search_manager = SearchManager()
-        self.install_manager = InstallManager()
-        self.ping_manager = PingManager()
-        self.speed_manager = SpeedManager()
+        super().__init__()
+        # Registry: mapping commands to (module_name, class_name, method_name)
+        # This provides a professional, scalable router avoiding massive if-else chains.
+        self.COMMAND_REGISTRY = {
+            "help": ("help_manager", "HelpManager", "show_help"),
+            "update": ("update_manager", "UpdateManager", "run"),
+            "upgrade": ("upgrade_manager", "UpgradeManager", "run"),
+            "clean": ("clean_manager", "CleanManager", "run"),
+            "ping": ("ping_manager", "PingManager", "run"),
+            "docker": ("docker_manager", "DockerManager", "manage"),
+            "logs": ("log_manager", "LogManager", "audit"),
+            "system": ("system_manager", "SystemManager", "start"),
+            "backup": ("backup_manager", "BackupManager", "execute_backup"),
+            "restore": ("backup_manager", "BackupManager", "execute_restore"),
+            "doctor": ("doctor_manager", "DoctorManager", "run"),
+            "extract": ("extract_manager", "ExtractManager", "run"),
+            "fetch": ("fetch_manager", "FetchManager", "run"),
+            "file": ("file_manager", "FileManager", "run"),
+            "info": ("info_manager", "InfoManager", "run"),
+            "install": ("install_manager", "InstallManager", "run"),
+            "ports": ("network_manager", "NetworkManager", "show_listening_ports"),
+            "search": ("search_manager", "SearchManager", "run"),
+            "security": ("security_manager", "SecurityManager", "run"),
+            "service": ("service_manager", "ServiceManager", "run"),
+            "speedtest": ("speed_manager", "SpeedManager", "run"),
+            "history": ("history_manager", "HistoryManager", "run"),
+            "tree": ("tree_manager", "TreeManager", "run"),
+        }
 
-        # Kode warna khusus untuk tampilan lokal
-        self.C_PINE = "\033[36m"
-        self.C_GOLD = "\033[33m"
-        self.C_RESET = "\033[0m"
-        self.C_BOLD = "\033[1m"
+    def setup_parser(self):
+        parser = argparse.ArgumentParser(
+            description="One CLI - Professional Enterprise System & Package Manager",
+            usage="one <command> [options]",
+            add_help=False
+        )
+        parser.add_argument("command", nargs="?", help="Command to execute")
+        return parser
 
-    def get_all_installed_apps(self):
-        """Mendeteksi semua aplikasi GUI/Interaktif berbasis file .desktop"""
-        apps = {}
-        desktop_files = glob.glob(self.system_apps_path) + glob.glob(self.user_apps_path)
-        
-        for file_path in desktop_files:
-            try:
-                with open(file_path, 'r', errors='ignore') as f:
-                    content = f.read()
-                    name, exec_path, app_type = None, None, "Manual/External"
-                    
-                    if "X-Flatpak" in content:
-                        app_type = "Flatpak"
-                    elif "snap/" in content or "/snap/bin" in content:
-                        app_type = "Snap Store"
-                    elif "/usr/bin/" in content or "/usr/games/" in content:
-                        app_type = "APT (Native Debian/Ubuntu)"
-                    
-                    for line in content.splitlines():
-                        if line.startswith("Name="):
-                            name = line.split("=", 1)[1].strip()
-                        elif line.startswith("Exec="):
-                            exec_path = line.split("=", 1)[1].strip().split()[0]
-                        if name and exec_path:
-                            break
-                    
-                    if name:
-                        pkg_id = os.path.basename(file_path).replace(".desktop", "")
-                        apps[pkg_id] = {
-                            "name": name,
-                            "type": app_type,
-                            "exec": exec_path,
-                            "desktop_file": file_path
-                        }
-            except Exception:
-                continue
-        return apps
-
-    def get_systemd_services(self):
-        """Mendeteksi layanan/daemons latar belakang yang aktif di sistem"""
-        services = []
-        try:
-            # Memanggil systemctl untuk list semua service tipe @service yang loaded
-            result = subprocess.run(
-                ["systemctl", "list-units", "--type=service", "--state=active", "--no-legend"],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-            )
+    def dispatch(self, cmd):
+        """Dynamically load and execute the appropriate manager."""
+        if cmd not in self.COMMAND_REGISTRY:
+            self.error(f"Unknown command: '{cmd}'.")
+            self.info("Use 'one help' to view all available commands.")
+            return False
             
-            for line in result.stdout.splitlines():
-                parts = line.split()
-                if len(parts) >= 1:
-                    service_name = parts[0]
-                    # Bersihkan ekstensi '.service' agar tampilannya cantik
-                    service_id = service_name.replace(".service", "")
-                    
-                    # Ambil deskripsi singkat layanannya jika ada
-                    description = " ".join(parts[4:]) if len(parts) > 4 else "Layanan latar belakang"
-                    services.append(f"🛠️  {service_id} {self.C_GOLD}({description}){self.C_RESET}")
-        except Exception:
-            # Fallback jika dijalankan di lingkungan WSL lama yang tidak pakai systemd
-            if os.path.exists("/etc/init.d"):
-                for path in glob.glob("/etc/init.d/*"):
-                    service_id = os.path.basename(path)
-                    if service_id not in ["README", "skeleton"]:
-                        services.append(f"🛠️  {service_id} {self.C_GOLD}(SysVinit Service){self.C_RESET}")
-        return services
-
-    def smart_list(self):
-        print(f"{self.C_PINE}============== ALL APPS & SERVICES DETECTED BY ONE =============={self.C_RESET}\n")
+        module_name, class_name, method_name = self.COMMAND_REGISTRY[cmd]
         
-        # 1. Tampilkan Aplikasi Visual (GUI / Interactive)
-        all_apps = self.get_all_installed_apps()
-        categorized = {"APT (Native Debian/Ubuntu)": [], "Snap Store": [], "Flatpak": [], "Manual/External": []}
-        
-        for pkg_id, info in all_apps.items():
-            categorized[info["type"]].append(f"📌 {info['name']} {self.C_GOLD}({pkg_id}){self.C_RESET}")
-            
-        for app_type, app_list in categorized.items():
-            if app_list:
-                icon = "📦" if "APT" in app_type else "🛍️" if "Snap" in app_type else "🚀" if "Flatpak" in app_type else "⭐"
-                print(f"{icon} {self.C_BOLD}{app_type}{self.C_RESET}:")
-                sorted_list = sorted(app_list)
-                for i, app in enumerate(sorted_list):
-                    if i == len(sorted_list) - 1:
-                        print(f"  └─ {app}")
-                    else:
-                        print(f"  ├─ {app}")
-                print()
-
-        # 2. Tampilkan Layanan Latar Belakang (Services/Daemons)
-        services_list = self.get_systemd_services()
-        if services_list:
-            print(f"⚙️  {self.C_BOLD}System Services & Daemons (Latar Belakang){self.C_RESET}:")
-            sorted_services = sorted(services_list)
-            for i, svc in enumerate(sorted_services):
-                if i == len(sorted_services) - 1:
-                    print(f"  └─ {svc}")
-                else:
-                    print(f"  ├─ {svc}")
-            print()
-                
-        print(f"{self.C_PINE}=================================================================={self.C_RESET}")
-
-    def smart_remove(self, package_id: str):
-        """Menghapus aplikasi atau menghentikan service secara fleksibel"""
-        fixed_package_id = self.utils.fix_typo_or_alias(package_id)
-        all_apps = self.get_all_installed_apps()
-        
-        # Cek apakah yang mau dihapus/dimatikan adalah sebuah SERVICE sistem
-        # Kita cek apakah service tersebut ada di daftar running systemd
         try:
-            check_svc = subprocess.run(["systemctl", "is-active", f"{fixed_package_id}.service"], stdout=subprocess.PIPE, text=True)
-            if check_svc.returncode == 0:
-                print(f"⚙️  Mendeteksi '{fixed_package_id}' sebagai layanan sistem yang aktif.")
-                confirm = input(f"❓ Apakah kamu ingin menonaktifkan & mematikan service ini, sayang? (y/n): ").lower()
-                if confirm == 'y':
-                    print(f"🔥 Mematikan dan menonaktifkan service: {fixed_package_id}...")
-                    subprocess.run(["sudo", "systemctl", "stop", f"{fixed_package_id}.service"])
-                    subprocess.run(["sudo", "systemctl", "disable", f"{fixed_package_id}.service"])
-                    print(f"🎉 Service '{fixed_package_id}' berhasil dimatikan total, sayang!")
-                return
+            # Dynamically import the required module
+            module = importlib.import_module(f"core.{module_name}")
+            manager_class = getattr(module, class_name)
+            manager_instance = manager_class()
+            
+            # Retrieve the appropriate method to run
+            method = getattr(manager_instance, method_name)
+            method()
+            return True
+            
+        except ImportError:
+            # Graceful fallback for commands without a fully implemented module
+            self._fallback_inline(cmd)
+            return True
+        except AttributeError as e:
+            self.error(f"Implementation error in '{module_name}': {e}")
+            return False
+        except Exception as e:
+            self.error(f"Execution failed for command '{cmd}': {e}")
+            return False
+
+    def _fallback_inline(self, cmd):
+        """Fallback inline implementations for essential commands."""
+        if cmd == "update": 
+            self.info("Running system update...")
+            self._run_sys(["sudo", "apt", "update"])
+        elif cmd == "clean":
+            self.info("Running system cleanup...")
+            self._run_sys(["sudo", "apt-get", "clean"])
+            self._run_sys(["sudo", "apt-get", "autoremove", "-y"])
+            self.success("System cache cleaned successfully.")
+        elif cmd == "ping": 
+            self.info("Pinging Cloudflare DNS to check connectivity...")
+            self._run_sys(["ping", "-c", "4", "1.1.1.1"])
+        elif cmd == "upgrade":
+            self.info("Upgrading ONE CLI from repository...")
+            os.chdir(os.path.expanduser("~/one"))
+            self._run_sys(["git", "pull"])
+            self.success("Upgrade complete.")
+        else:
+            self.warn(f"Command '{cmd}' is registered but its module is not implemented yet.")
+
+    def _log_command(self, command, arguments):
+        """Logs the executed command to a history file."""
+        if command in ['help', 'history']:
+            return
+        
+        history_file = os.path.expanduser("~/.one_history")
+        full_command = f"one {command} {' '.join(arguments)}"
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            with open(history_file, "a") as f:
+                f.write(f"{timestamp} | {full_command}\n")
         except Exception:
+            # Fail silently, logging is not a critical path.
             pass
 
-        # Jika bukan service, jalankan logika penghapusan aplikasi biasa seperti kemarin
-        if fixed_package_id not in all_apps:
-            print(f"❌ Aplikasi atau Service '{fixed_package_id}' tidak ditemukan di sistem, sayang.")
-            return
-            
-        app_info = all_apps[fixed_package_id]
-        app_type = app_info["type"]
-        print(f"🔥 Memulai proses penghapusan untuk: {self.C_BOLD}{app_info['name']}{self.C_RESET} [{app_type}]...")
+    def run(self):
+        parser = self.setup_parser()
+        args, unknown = parser.parse_known_args()
         
-        if app_type == "APT (Native Debian/Ubuntu)":
-            subprocess.run(["sudo", "apt-get", "purge", "-y", fixed_package_id])
-            subprocess.run(["sudo", "apt-get", "autoremove", "-y"])
-        elif app_type == "Snap Store":
-            subprocess.run(["sudo", "snap", "remove", fixed_package_id])
-        elif app_type == "Flatpak":
-            subprocess.run(["flatpak", "uninstall", "-y", fixed_package_id])
-        else:
-            print("⚙️  Mendeteksi instalasi manual. Menghapus pintasan sistem...")
-            if os.path.exists(app_info["desktop_file"]):
-                os.remove(app_info["desktop_file"])
-                print("✅ File pintasan .desktop berhasil dihapus.")
+        if not args.command:
+            HelpManager().show_help()
+            sys.exit(0)
             
-            exec_cmd = app_info["exec"]
-            if os.path.exists(exec_cmd) and not exec_cmd.startswith(("/usr", "/bin", "/sbin")):
-                app_dir = os.path.dirname(exec_cmd)
-                print(f"🧹 Membersihkan folder sisa aplikasi di: {app_dir}")
-                subprocess.run(["rm", "-rf", app_dir])
-                print("✅ Folder aplikasi berhasil dibersihkan.")
-                
-        print(f"🎉 Aplikasi '{app_info['name']}' sukses dihapus total, sayang!")
+        cmd = args.command.lower()
+        self._log_command(cmd, unknown)
+        start_time = time.time()
+        
+        try:
+            self.dispatch(cmd)
+        except KeyboardInterrupt:
+            print()
+            self.warn("Operation cancelled by user (SIGINT).")
+            sys.exit(130)
+        except subprocess.CalledProcessError as e:
+            self.error(f"Process terminated with exit code {e.returncode}.")
+            sys.exit(e.returncode)
+        except Exception as e:
+            self.error(f"An unexpected error occurred: {e}")
+            sys.exit(1)
+        finally:
+            elapsed = time.time() - start_time
+            if cmd != "help":
+                # Optional professional execution metric
+                # self.info(f"Execution time: {elapsed:.2f}s")
+                pass
+
+    def _run_sys(self, args):
+        """Execute system commands safely with standard interactive behavior."""
+        subprocess.run(args, check=True)
 
 if __name__ == '__main__':
-    manager = PackageManager()
-    
-    if len(sys.argv) > 1:
-        command = sys.argv[1]
-        
-        if command == "list":
-            manager.smart_list()
-            
-        elif command == "remove" and len(sys.argv) > 2:
-            arg2 = sys.argv[2]
-
-            # Memanggil fungsi dari file_manager.py jika memakai argumen -d
-            if arg2 == "-d" and len(sys.argv) > 3:
-                target_berkas = sys.argv[3]
-                manager.file_handler.delete_item(target_berkas)
-
-            elif arg2 == "-d" and len(sys.argv) <= 3:
-                print(f"❌ Argumen -d membutuhkan nama file atau folder yang ingin dihapus, sayang.")
-                print(f"💡 Contoh: one remove -d dokumen.pdf")
-
-            else:
-                # Jika tidak pakai -d, hapus paket aplikasi internet seperti biasa
-                print(f"🗑️  Memproses penghapusan paket/layanan untuk: '{arg2}'...")
-                manager.smart_remove(arg2)
-            
-        elif command == "search" and len(sys.argv) > 2:
-            # Mengambil argumen setelah kata 'search'
-            arg2 = sys.argv[2]
-            
-            # FITUR BARU: Jika user memasukkan argumen -f untuk mencari file/folder, sayang
-            if arg2 == "-f" and len(sys.argv) > 3:
-                target_search = sys.argv[3]
-                print(f"📂 {manager.C_PINE}Mencari file atau folder bernama: '{target_search}'...{manager.C_RESET}\n")
-                
-                # Kita jalankan perintah 'find' dari direktori home user (~/) agar aman dan cepat
-                # -iname membuat pencarian bersifat Case-Insensitive (tidak peduli huruf besar/kecil)
-                # 2>/dev/null digunakan untuk menyembunyikan pesan error "Permission Denied" yang mengganggu
-                try:
-                    home_dir = os.path.expanduser("~")
-                    result = subprocess.run(
-                        f"find {home_dir} -iname '*{target_search}*' 2>/dev/null",
-                        shell=True, stdout=subprocess.PIPE, text=True
-                    )
-                    
-                    if result.stdout.strip():
-                        # Tampilkan hasil pencarian berkas dengan estetik
-                        lines = result.stdout.splitlines()
-                        print(f"✨ Berhasil menemukan {len(lines)} lokasi:")
-                        for line in lines:
-                            # Jika yang ditemukan adalah folder, beri warna gold, jika file biasa beri warna default
-                            if os.path.isdir(line):
-                                print(f"  📁 {manager.C_GOLD}{line}{manager.C_RESET}")
-                            else:
-                                print(f"  📄 {line}")
-                    else:
-                        print(f"❌ File atau folder '{target_search}' tidak ditemukan di direktori home kamu, sayang.")
-                except Exception as e:
-                    print(f"❌ Terjadi kesalahan saat mencari: {e}")
-                    
-            elif arg2 == "-f" and len(sys.argv) <= 3:
-                print(f"❌ Argumen -f membutuhkan nama file atau folder yang dicari, sayang.")
-                print(f"💡 Contoh: one search -f dokumen.txt")
-                
-            else:                # Jika tidak pakai argumen -f, jalankan pencarian paket aplikasi seperti biasa
-                fixed_name = manager.utils.fix_typo_or_alias(arg2)
-                manager.search_manager.unified_search(fixed_name)
-            
-        elif command == "install":
-            if len(sys.argv) > 2:
-                pkg_target = sys.argv[2]
-                # Perbaiki typo atau alias otomatis dulu jika ada
-                fixed_name = manager.utils.fix_typo_or_alias(pkg_target)
-
-                # Panggil modul installer pintar kita!
-                manager.install_manager.smart_install(fixed_name)
-            else:
-                print("\033[38;2;235;111;145m❌ Masukkan nama paket yang ingin dipasang, sayang! Contoh: one install vlc\033[0m")
-
-        elif command == "update":
-            manager.update_manager.check_and_update()
-
-        elif command == "extract" and len(sys.argv) > 2:
-            archive_file = sys.argv[2]
-            manager.extractor.extract(archive_file)
-
-        elif command == "extract" and len(sys.argv) <= 2:
-            print("❌ Perintah 'extract' membutuhkan argumen nama file arsip, sayang.")
-            print("💡 Contoh: one extract berkas.zip")
-            
-        elif command in ["help", "-h", "--help"]:
-            manager.helper.show_help()
-
-        elif command == "system":
-            print("🚀 Membuka Dashboard Sistem...")
-            manager.system_monitor.start()
-
-        elif command == "fetch":
-            manager.fetch_manager.show_fetch()
-
-        elif command == "doctor":
-            manager.doctor_manager.run_diagnose()
-
-        elif command == "clean":
-            manager.clean_manager.execute_clean()
-
-        elif command == "ping":
-            manager.ping_manager.execute_ping()
-        
-        elif command == "speedtest":
-            manager.speed_manager.execute_speedtest()
-
-        elif command == "upgrade":
-            manager.upgrade_manager.pull_latest_code()
-            
-        else:
-            # Jika argumen yang dimasukkan salah atau kurang (misal ketik 'one install' tanpa nama aplikasi)
-            if command in ["install", "search", "remove"] and len(sys.argv) <= 2:
-                print(f"❌ Perintah '{command}' membutuhkan nama aplikasi, sayang.")
-                print(f"💡 Contoh: one {command} nama-aplikasi")
-            else:
-                print(f"❌ Perintah '{command}' tidak dikenal.")
-                manager.helper.show_help()
-
-        
-    else:
-        # Jika cuma ketik 'one' tanpa argumen sama sekali
-        manager.helper.show_help()
+    PackageManager().run()

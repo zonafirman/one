@@ -1,18 +1,16 @@
-# core/update_manager.py
 import subprocess
+from core.base_manager import BaseManager
 
-class UpdateManager:
+class UpdateManager(BaseManager):
     def __init__(self):
-        # Warna estetik ala Rosé Pine
-        self.C_PINE = "\033[36m"
-        self.C_RESET = "\033[0m"
+        super().__init__()
 
-    def check_and_update(self):
-        """Fungsi untuk menyegarkan indeks paket repositori sistem Linux, sayang"""
-        print(f"🔄 {self.C_PINE}Menyegarkan daftar paket repositori sistem (apt update)...{self.C_RESET}\n")
+    def run(self):
+        self.info("Synchronizing package index files (apt update)...")
         try:
-            # Mengeksekusi perintah apt update bawaan Linux secara langsung
             subprocess.run(["sudo", "apt", "update"], check=True)
-            print(f"\n🎉 {self.C_PINE}Daftar paket berhasil diperbarui, sayang! Sistem siap menginstal aplikasi terbaru.{self.C_RESET}")
+            self.success("Package database updated successfully.")
         except subprocess.CalledProcessError:
-            print(f"\n❌ Gagal memperbarui daftar paket repositori.")
+            self.error("Failed to refresh package repositories. Check for errors above.")
+        except Exception as e:
+            self.error(f"An unexpected error occurred: {e}")
