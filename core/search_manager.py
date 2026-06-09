@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import os
 import shutil
 import concurrent.futures
 from core.base_manager import BaseManager
@@ -56,11 +57,44 @@ class SearchManager(BaseManager):
         else:
             print(f"      {self.C_SUBTLE}({empty_msg}){self.C_RESET}")
 
+    def search_file(self, query):
+        self.info(f"Searching local files/folders matching: '{query}'...")
+        try:
+            home_dir = os.path.expanduser("~")
+            cmd = ["find", home_dir, "-iname", f"*{query}*"]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            lines = res.stdout.strip().splitlines()
+            
+            if not lines:
+                self.warn(f"No files or folders found matching '{query}'.")
+                return
+                
+            print(f"\n  {self.C_BOLD}{self.C_GREEN}[ Local Search Results (Max 15) ]{self.C_RESET}")
+            for line in lines[:15]:
+                print(f"      📄 {self.C_CYAN}{line}{self.C_RESET}")
+                
+            if len(lines) > 15:
+                print(f"      {self.C_SUBTLE}...and {len(lines) - 15} more hidden.{self.C_RESET}")
+                
+            self.success("File search complete.")
+        except Exception as e:
+            self.error(f"Error during file search: {e}")
+
     def run(self):
-        query = " ".join(sys.argv[2:])
-        if not query:
-            self.error("Usage: one search <query>")
+        args = sys.argv[2:]
+        if not args:
+            self.error("Usage: one search [-f] <query>")
             return
+            
+        if args[0] == "-f":
+            if len(args) < 2:
+                self.error("Usage: one search -f <file_or_folder_name>")
+                return
+            query = " ".join(args[1:])
+            self.search_file(query)
+            return
+            
+        query = " ".join(args)
         self.info(f"Searching for '{query}' across multiple repositories (parallel)...")
         
         with concurrent.futures.ThreadPoolExecutor() as executor:

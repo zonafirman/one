@@ -39,10 +39,36 @@ class InstallManager(BaseManager):
         return suggestions[:5]
 
     def run(self):
-        if len(sys.argv) < 3:
-            self.error("Usage: one install <package_name>")
+        args = sys.argv[2:]
+        if not args:
+            self.error("Usage: one install [-l] <package_name>")
             return
-        self.smart_install(sys.argv[2])
+            
+        if args[0] == "-l":
+            if len(args) < 2:
+                self.error("Usage: one install -l <path_to_deb_file>")
+                return
+            self.install_local(args[1])
+            return
+            
+        self.smart_install(args[0])
+
+    def install_local(self, file_path):
+        import os
+        abs_path = os.path.abspath(file_path)
+        if not os.path.exists(abs_path):
+            self.error(f"File not found: {file_path}")
+            return
+        if not abs_path.endswith(".deb"):
+            self.error("Local installation only supports .deb files.")
+            return
+            
+        self.info(f"Installing local package: {os.path.basename(abs_path)}")
+        try:
+            subprocess.run(["sudo", "apt-get", "install", "-y", abs_path], check=True)
+            self.success(f"Successfully installed {os.path.basename(abs_path)}")
+        except subprocess.CalledProcessError:
+            self.error("Failed to install local package.")
 
     def smart_install(self, pkg_name):
         if not pkg_name:
