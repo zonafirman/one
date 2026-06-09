@@ -3,12 +3,18 @@ from core.help_manager import HelpManager
 from core.base_manager import BaseManager
 
 class PackageManager(BaseManager):
+    """
+    PackageManager acts as the central orchestrator and router for the One-CLI application.
+    It registers all available commands and dynamically dispatches execution to the 
+    corresponding specific manager class, ensuring modularity and easy extendability.
+    """
     def __init__(self):
         super().__init__()
         # Registry: mapping commands to (module_name, class_name, method_name)
         # This provides a professional, scalable router avoiding massive if-else chains.
         self.COMMAND_REGISTRY = {
             "help": ("help_manager", "HelpManager", "show_help"),
+            "version": ("version_manager", "VersionManager", "run"),
             "update": ("update_manager", "UpdateManager", "run"),
             "upgrade": ("upgrade_manager", "UpgradeManager", "run"),
             "clean": ("clean_manager", "CleanManager", "run"),

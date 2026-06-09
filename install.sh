@@ -1,6 +1,8 @@
 #!/bin/bash
 # ====================================================================
 #  One-CLI Pro Edition - System Installer
+#  This script copies the core modules into the user's home directory
+#  and injects the `one` bash/zsh function into the user's shell profile.
 # ====================================================================
 
 REPO_DIR="$HOME/one"  

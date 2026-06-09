@@ -47,6 +47,7 @@ class HelpManager(BaseManager):
             },
             "⚙️  CLI Management": {
                 "upgrade": "Tarik versi kode One-CLI terbaru dari Git.",
+                "version": "Tampilkan versi One-CLI yang sedang berjalan.",
                 "help": "Tampilkan panduan ini.",
             }
         }
