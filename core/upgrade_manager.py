@@ -6,6 +6,7 @@ class UpgradeManager(BaseManager):
     def __init__(self):
         super().__init__()
 
+
     def run(self):
         self.info("Checking for and applying One-CLI updates from the Git repository...")
         
